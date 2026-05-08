@@ -113,20 +113,6 @@ internal static class KeyframeMotionLibrary
             Frame(0.80, 0, -1.8, 0.4, 1.003, 1.004),
             Frame(1.25, 0, 0, 0, 1.000, 1.000)),
 
-        [PetPose.LookLeft] = new MotionProfile(
-            1.8,
-            Frame(0.00, -2.0, -0.4, -4.8, 1.000, 1.000),
-            Frame(0.55, -3.0, -1.4, -6.2, 1.004, 1.002),
-            Frame(1.20, -2.2, -0.7, -5.2, 0.998, 1.005),
-            Frame(1.80, -2.0, -0.4, -4.8, 1.000, 1.000)),
-
-        [PetPose.LookRight] = new MotionProfile(
-            1.8,
-            Frame(0.00, 2.0, -0.4, 4.8, 1.000, 1.000),
-            Frame(0.55, 3.0, -1.4, 6.2, 1.004, 1.002),
-            Frame(1.20, 2.2, -0.7, 5.2, 0.998, 1.005),
-            Frame(1.80, 2.0, -0.4, 4.8, 1.000, 1.000)),
-
         [PetPose.Wave] = new MotionProfile(
             1.2,
             Frame(0.00, 0, 0, 0, 1.000, 1.000),

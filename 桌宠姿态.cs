@@ -4,8 +4,6 @@ internal enum PetPose
 {
     Idle,
     Blink,
-    LookLeft,
-    LookRight,
     Wave,
     Happy,
     Startled,
@@ -28,8 +26,6 @@ internal static class PetPoseText
     {
         PetPose.Idle => "待机",
         PetPose.Blink => "眨眼",
-        PetPose.LookLeft => "看左边",
-        PetPose.LookRight => "看右边",
         PetPose.Wave => "打招呼",
         PetPose.Happy => "开心",
         PetPose.Startled => "吓一跳",

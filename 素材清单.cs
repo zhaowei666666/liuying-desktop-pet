@@ -108,8 +108,6 @@ internal sealed class AssetCatalog
     {
         [PetPose.Idle] = "待机_正面.png",
         [PetPose.Blink] = "待机_眨眼.png",
-        [PetPose.LookLeft] = "注视_左.png",
-        [PetPose.LookRight] = "注视_右.png",
         [PetPose.Wave] = "打招呼.png",
         [PetPose.Happy] = "靠近_开心.png",
         [PetPose.Startled] = "快速经过_受惊.png",

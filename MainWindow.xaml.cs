@@ -153,11 +153,6 @@ public partial class MainWindow : Window
             return PetPose.Happy;
         }
 
-        if (Math.Abs(dx) > 70 || dy < -55)
-        {
-            return dx < 0 ? PetPose.LookLeft : PetPose.LookRight;
-        }
-
         return GetTimePose(now);
     }
 
