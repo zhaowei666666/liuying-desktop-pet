@@ -17,8 +17,6 @@ public partial class MainWindow : Window
 {
     private const double BaseWidth = 240;
     private const double BaseHeight = 270;
-    private const double ChaseDistance = 360;
-    private const double ComfortableDistance = 185;
     private const double CloseDistance = 120;
 
     private readonly SettingsService _settingsService = new();
@@ -32,7 +30,6 @@ public partial class MainWindow : Window
     private Forms.NotifyIcon? _trayIcon;
     private Forms.ToolStripMenuItem? _showItem;
     private Forms.ToolStripMenuItem? _topMostItem;
-    private Forms.ToolStripMenuItem? _followItem;
     private Forms.ToolStripMenuItem? _startupItem;
 
     private PetPose _currentPose = PetPose.Idle;
@@ -118,11 +115,6 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (_settings.FollowCursor && IsVisible)
-            {
-                MoveTowardCursor(cursor, dt);
-            }
-
             var pose = SelectPose(cursor, now);
             ApplyPose(pose);
             ApplyAnimation(pose);
@@ -162,28 +154,12 @@ public partial class MainWindow : Window
             return PetPose.Happy;
         }
 
-        if (_settings.FollowCursor && distance > ChaseDistance)
-        {
-            return GetRunPose(dx);
-        }
-
         if (Math.Abs(dx) > 70 || dy < -55)
         {
             return dx < 0 ? PetPose.LookLeft : PetPose.LookRight;
         }
 
         return GetTimePose(now);
-    }
-
-    private PetPose GetRunPose(double dx)
-    {
-        var frame = ((int)(_clock.Elapsed.TotalMilliseconds / 220)) % 2;
-        if (dx >= 0)
-        {
-            return frame == 0 ? PetPose.RunRight1 : PetPose.RunRight2;
-        }
-
-        return frame == 0 ? PetPose.RunLeft1 : PetPose.RunLeft2;
     }
 
     private PetPose GetTimePose(DateTime now)
@@ -344,30 +320,6 @@ public partial class MainWindow : Window
         StatusBubble.Opacity = 0;
     }
 
-    private void MoveTowardCursor(WpfPoint cursor, double dt)
-    {
-        var center = GetWindowCenter();
-        var dx = cursor.X - center.X;
-        var dy = cursor.Y - center.Y;
-        var distance = Math.Sqrt(dx * dx + dy * dy);
-
-        if (distance <= ComfortableDistance)
-        {
-            return;
-        }
-
-        var maxSpeed = distance > ChaseDistance ? 320 : 120;
-        var step = Math.Min(distance - ComfortableDistance, maxSpeed * dt);
-        if (step <= 0)
-        {
-            return;
-        }
-
-        Left += dx / distance * step;
-        Top += dy / distance * step;
-        ClampWindowToScreen();
-    }
-
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _isDragging = true;
@@ -512,18 +464,12 @@ public partial class MainWindow : Window
         var menu = new Forms.ContextMenuStrip();
         _showItem = new Forms.ToolStripMenuItem("隐藏桌宠", null, (_, _) => ToggleVisibility());
         _topMostItem = new Forms.ToolStripMenuItem("置顶显示") { CheckOnClick = true };
-        _followItem = new Forms.ToolStripMenuItem("跟随鼠标") { CheckOnClick = true };
         _startupItem = new Forms.ToolStripMenuItem("开机自启") { CheckOnClick = true };
 
         _topMostItem.Click += (_, _) =>
         {
             _settings.TopMost = _topMostItem.Checked;
             Topmost = _settings.TopMost;
-            _settingsService.Save(_settings);
-        };
-        _followItem.Click += (_, _) =>
-        {
-            _settings.FollowCursor = _followItem.Checked;
             _settingsService.Save(_settings);
         };
         _startupItem.Click += (_, _) =>
@@ -537,7 +483,6 @@ public partial class MainWindow : Window
         menu.Items.Add(_showItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(_topMostItem);
-        menu.Items.Add(_followItem);
         menu.Items.Add(_startupItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(CreateScaleItem("缩放 75%", 0.75));
@@ -583,11 +528,6 @@ public partial class MainWindow : Window
         if (_topMostItem is not null)
         {
             _topMostItem.Checked = _settings.TopMost;
-        }
-
-        if (_followItem is not null)
-        {
-            _followItem.Checked = _settings.FollowCursor;
         }
 
         if (_startupItem is not null)
