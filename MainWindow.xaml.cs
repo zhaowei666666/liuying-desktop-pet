@@ -40,6 +40,7 @@ public partial class MainWindow : Window
     private DateTime _lastTick = DateTime.Now;
     private WpfPoint? _lastCursor;
     private PetPose? _loadedPose;
+    private MotionSample _currentMotion = MotionSample.Neutral;
     private double _cursorSpeed;
     private string? _currentSpriteProblem;
     private bool _isExitRequested;
@@ -110,14 +111,14 @@ public partial class MainWindow : Window
             if (_isDragging)
             {
                 ApplyPose(PetPose.Dragged);
-                ApplyAnimation(PetPose.Dragged);
+                ApplyAnimation(PetPose.Dragged, dt);
                 UpdateStatusBubble(PetPose.Dragged);
                 return;
             }
 
             var pose = SelectPose(cursor, now);
             ApplyPose(pose);
-            ApplyAnimation(pose);
+            ApplyAnimation(pose, dt);
             UpdateStatusBubble(pose);
         }
         catch (Exception exception)
@@ -222,78 +223,18 @@ public partial class MainWindow : Window
         FallbackPet.Visibility = Visibility.Collapsed;
     }
 
-    private void ApplyAnimation(PetPose pose)
+    private void ApplyAnimation(PetPose pose, double dt)
     {
-        var t = _clock.Elapsed.TotalSeconds;
-        var bob = Math.Sin(t * 4.2) * 2.2;
-        var rotate = 0.0;
-        var scaleX = 1.0;
-        var scaleY = 1.0;
-        var shiftX = 0.0;
+        var elapsedInPose = (DateTime.Now - _poseChangedAt).TotalSeconds;
+        var target = KeyframeMotionLibrary.Sample(pose, elapsedInPose);
+        var smoothing = 1 - Math.Exp(-Math.Clamp(dt, 0.001, 0.08) * 14);
+        _currentMotion = MotionSample.Lerp(_currentMotion, target, smoothing);
 
-        switch (pose)
-        {
-            case PetPose.Happy:
-                bob = -4 + Math.Sin(t * 9) * 4;
-                scaleY = 1.03 + Math.Sin(t * 8) * 0.02;
-                break;
-            case PetPose.Startled:
-                bob = -7 + Math.Sin(t * 32) * 2;
-                rotate = Math.Sin(t * 36) * 4;
-                scaleX = 1.04;
-                scaleY = 0.96;
-                break;
-            case PetPose.Dragged:
-                bob = -12 + Math.Sin(t * 5) * 5;
-                rotate = Math.Sin(t * 4.5) * 6;
-                break;
-            case PetPose.RunRight1:
-            case PetPose.RunRight2:
-                bob = -2 - Math.Abs(Math.Sin(t * 15)) * 6;
-                rotate = 5;
-                shiftX = 3;
-                break;
-            case PetPose.RunLeft1:
-            case PetPose.RunLeft2:
-                bob = -2 - Math.Abs(Math.Sin(t * 15)) * 6;
-                rotate = -5;
-                shiftX = -3;
-                break;
-            case PetPose.LookLeft:
-                rotate = -5;
-                shiftX = -2;
-                break;
-            case PetPose.LookRight:
-                rotate = 5;
-                shiftX = 2;
-                break;
-            case PetPose.Wave:
-            case PetPose.Morning:
-            case PetPose.Noon:
-                bob = Math.Sin(t * 5.8) * 3;
-                rotate = Math.Sin(t * 4.2) * 2.2;
-                break;
-            case PetPose.Night:
-                bob = Math.Sin(t * 2.0) * 1.2;
-                rotate = Math.Sin(t * 1.6) * 1.5;
-                scaleY = 0.98;
-                break;
-            case PetPose.DeepNight:
-                bob = Math.Sin(t * 0.9) * 0.8;
-                scaleY = 0.94 + Math.Sin(t * 1.2) * 0.01;
-                break;
-            case PetPose.Clicked:
-                bob = -5 + Math.Sin(t * 10) * 3;
-                scaleX = 0.98 + Math.Sin(t * 12) * 0.015;
-                scaleY = 1.04 - Math.Sin(t * 12) * 0.015;
-                break;
-        }
-
-        SpriteScale.ScaleX = scaleX;
-        SpriteScale.ScaleY = scaleY;
-        SpriteRotate.Angle = rotate;
-        SpriteTranslate.X = shiftX;
-        SpriteTranslate.Y = bob;
+        SpriteScale.ScaleX = _currentMotion.ScaleX;
+        SpriteScale.ScaleY = _currentMotion.ScaleY;
+        SpriteRotate.Angle = _currentMotion.Rotation;
+        SpriteTranslate.X = _currentMotion.X;
+        SpriteTranslate.Y = _currentMotion.Y;
     }
 
     private void UpdateStatusBubble(PetPose pose)
