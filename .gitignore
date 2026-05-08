@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+*.log
+发布/
+publish/
+*.zip
+*.7z

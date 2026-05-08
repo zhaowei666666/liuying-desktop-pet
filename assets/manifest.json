@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "states": {
+    "Idle": "待机_正面.png",
+    "Blink": "待机_眨眼.png",
+    "LookLeft": "注视_左.png",
+    "LookRight": "注视_右.png",
+    "Wave": "打招呼.png",
+    "Happy": "靠近_开心.png",
+    "Startled": "快速经过_受惊.png",
+    "Dragged": "拖拽_抱起.png",
+    "RunRight1": "小跑_右_1.png",
+    "RunRight2": "小跑_右_2.png",
+    "RunLeft1": "小跑_左_1.png",
+    "RunLeft2": "小跑_左_2.png",
+    "Morning": "早晨_伸懒腰.png",
+    "Noon": "午间_鼓劲.png",
+    "Evening": "傍晚_放松.png",
+    "Night": "夜晚_犯困.png",
+    "DeepNight": "深夜_睡觉.png",
+    "Clicked": "点击_害羞.png"
+  }
+}
