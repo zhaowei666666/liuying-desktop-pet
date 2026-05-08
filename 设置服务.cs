@@ -29,8 +29,11 @@ internal sealed class SettingsService
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<PetSettings>(json, JsonOptions) ?? new PetSettings();
         }
-        catch
+        catch (Exception ex)
         {
+            ErrorLogService.Append(new InvalidOperationException(
+                $"Failed to load settings from '{SettingsPath}'.",
+                ex));
             return new PetSettings();
         }
     }
@@ -47,7 +50,22 @@ internal sealed class SettingsService
         }
         catch (Exception ex)
         {
-            ErrorLogService.Append(ex);
+            try
+            {
+                var tempPath = SettingsPath + ".tmp";
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
+            catch
+            {
+                // Best effort cleanup only.
+            }
+
+            ErrorLogService.Append(new InvalidOperationException(
+                $"Failed to save settings to '{SettingsPath}'.",
+                ex));
         }
     }
 }

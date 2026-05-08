@@ -63,10 +63,13 @@ internal sealed class AssetCatalog
             _cache[pose] = image;
             return image;
         }
-        catch
+        catch (Exception ex)
         {
             problem = $"素材无法读取：{relativeFile}";
             _cache[pose] = null;
+            ErrorLogService.Append(new InvalidOperationException(
+                $"Failed to load asset '{fullPath}' for pose '{pose}'.",
+                ex));
             return null;
         }
     }
@@ -100,7 +103,9 @@ internal sealed class AssetCatalog
         }
         catch (Exception ex)
         {
-            ErrorLogService.Append(ex);
+            ErrorLogService.Append(new InvalidOperationException(
+                $"Failed to parse manifest '{ManifestPath}'.",
+                ex));
             // Keep defaults when the manifest is temporarily malformed.
         }
     }
@@ -122,7 +127,8 @@ internal sealed class AssetCatalog
         [PetPose.Evening] = "傍晚_放松.png",
         [PetPose.Night] = "夜晚_犯困.png",
         [PetPose.DeepNight] = "深夜_睡觉.png",
-        [PetPose.Clicked] = "点击_害羞.png"
+        [PetPose.Clicked] = "点击_害羞.png",
+        [PetPose.ReleaseBounce] = "待机_正面.png"
     };
 
     private sealed class ManifestDocument

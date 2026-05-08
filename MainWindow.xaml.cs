@@ -34,6 +34,7 @@ public partial class MainWindow : Window
     private Forms.ToolStripMenuItem? _quietModeItem;
     private Forms.ToolStripMenuItem? _startupItem;
 
+    private PetPose _currentPose = PetPose.Idle;
     private PetPose? _forcedPose;
     private DateTime _poseChangedAt = DateTime.Now;
     private DateTime _forcedUntil = DateTime.MinValue;
@@ -272,6 +273,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        _currentPose = pose;
         _loadedPose = pose;
         _poseChangedAt = DateTime.Now;
 
@@ -569,7 +571,7 @@ public partial class MainWindow : Window
         _assets.ClearCache();
         _loadedPose = null;
         SpriteImage.Source = null;
-        ApplyPose(_loadedPose ?? PetPose.Idle);
+        ApplyPose(_currentPose);
         if (!_settings.QuietMode)
         {
             ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.2));
