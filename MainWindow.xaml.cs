@@ -34,12 +34,11 @@ public partial class MainWindow : Window
     private Forms.ToolStripMenuItem? _quietModeItem;
     private Forms.ToolStripMenuItem? _startupItem;
 
-    private PetPose _currentPose = PetPose.Idle;
-    private DateTime _poseChangedAt = DateTime.Now;
     private PetPose? _forcedPose;
+    private DateTime _poseChangedAt = DateTime.Now;
     private DateTime _forcedUntil = DateTime.MinValue;
     private DateTime _lastStartleAt = DateTime.MinValue;
-    private DateTime _nextRandomActionAt = DateTime.MinValue;
+    private DateTime _nextRandomActionAt = DateTime.Now + TimeSpan.FromSeconds(5);
     private DateTime _lastTick = DateTime.Now;
     private WpfPoint? _lastCursor;
     private PetPose? _loadedPose;
@@ -59,7 +58,6 @@ public partial class MainWindow : Window
 
         _timeOverride = CommandLineTime.Parse(args);
         _settings = _settingsService.Load();
-        _settings.Scale = ClampScale(_settings.Scale);
         _settings.StartWithWindows = StartupService.IsEnabled();
 
         _timer = new DispatcherTimer
@@ -175,6 +173,8 @@ public partial class MainWindow : Window
         return GetTimePose(now);
     }
 
+    // Quiet mode blinks less often (1 s every 12 s) than normal mode
+    // (2 s every 10 s) to minimise visual distraction during focused work.
     private PetPose GetQuietPose(DateTime now)
     {
         var seconds = (int)_clock.Elapsed.TotalSeconds;
@@ -272,7 +272,6 @@ public partial class MainWindow : Window
             return;
         }
 
-        _currentPose = pose;
         _loadedPose = pose;
         _poseChangedAt = DateTime.Now;
 
@@ -570,7 +569,7 @@ public partial class MainWindow : Window
         _assets.ClearCache();
         _loadedPose = null;
         SpriteImage.Source = null;
-        ApplyPose(_currentPose);
+        ApplyPose(_loadedPose ?? PetPose.Idle);
         if (!_settings.QuietMode)
         {
             ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.2));

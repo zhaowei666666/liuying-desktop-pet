@@ -98,8 +98,9 @@ internal sealed class AssetCatalog
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
+            ErrorLogService.Append(ex);
             // Keep defaults when the manifest is temporarily malformed.
         }
     }

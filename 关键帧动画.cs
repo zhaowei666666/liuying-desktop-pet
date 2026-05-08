@@ -88,6 +88,11 @@ internal sealed class MotionProfile
 
     private static double SmoothStep(double value)
     {
+        if (double.IsNaN(value))
+        {
+            return 0;
+        }
+
         value = Math.Clamp(value, 0, 1);
         return value * value * (3 - 2 * value);
     }

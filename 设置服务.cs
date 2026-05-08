@@ -37,8 +37,17 @@ internal sealed class SettingsService
 
     public void Save(PetSettings settings)
     {
-        Directory.CreateDirectory(SettingsDirectory);
-        var json = JsonSerializer.Serialize(settings, JsonOptions);
-        File.WriteAllText(SettingsPath, json);
+        try
+        {
+            Directory.CreateDirectory(SettingsDirectory);
+            var json = JsonSerializer.Serialize(settings, JsonOptions);
+            var tempPath = SettingsPath + ".tmp";
+            File.WriteAllText(tempPath, json);
+            File.Move(tempPath, SettingsPath, overwrite: true);
+        }
+        catch (Exception ex)
+        {
+            ErrorLogService.Append(ex);
+        }
     }
 }
