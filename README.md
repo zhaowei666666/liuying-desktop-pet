@@ -1,103 +1,86 @@
-<p align="center">
-  <img src="assets/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%888%E6%97%A5%2014_21_59.png" width="210" alt="流萤桌宠">
-</p>
+<div align="center">
+  <img src="assets/ChatGPT%20Image%202026%E5%B9%B45%E6%9C%888%E6%97%A5%2014_21_59.png" width="180" alt="流萤桌宠">
+  <h1>流萤桌宠 (Firefly Desktop Pet)</h1>
+  <p>一个轻量、透明、治愈系的 Windows Q 版流萤桌面小伙伴</p>
 
-<h1 align="center">流萤桌宠</h1>
+  <div>
+    <img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=for-the-badge&logo=windows" alt="Windows">
+    <img src="https://img.shields.io/badge/Framework-WPF%20.NET%2010-512BD4?style=for-the-badge&logo=.net" alt="WPF">
+    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
+    <img src="https://img.shields.io/badge/Status-Cute%20&%20Tiny-F6C6D9?style=for-the-badge" alt="Status">
+  </div>
+</div>
 
-<p align="center">
-  一个轻量、透明、不会乱跑的 Windows Q 版流萤桌面小伙伴。
-</p>
+---
 
-<p align="center">
-  <img alt="WPF" src="https://img.shields.io/badge/WPF-.NET%2010-4CBFBA?style=for-the-badge">
-  <img alt="Windows" src="https://img.shields.io/badge/Windows-Desktop-1F2937?style=for-the-badge">
-  <img alt="License" src="https://img.shields.io/badge/status-cute%20and%20tiny-F6C6D9?style=for-the-badge">
-</p>
+## 🌟 项目简介
 
-## 亮点
+**流萤桌宠** 是一款专为 Windows 设计的桌面伴侣。她安静地待在你的屏幕角落，陪伴你工作和学习。采用 WPF 技术实现，具有极低的内存占用和极高的响应速度。
 
-| 能力 | 说明 |
-| --- | --- |
-| 轻量悬浮 | WPF 透明无边框窗口，默认置顶，不占普通任务栏。 |
-| 不打扰 | 不会追鼠标、不会头顶冒字，只保留必要互动。 |
-| 关键帧动作 | 呼吸、弹跳、受惊、拖拽、松手回弹都用缓动关键帧。 |
-| 随机小动作 | 空闲时偶尔挥手、眨眼或切换时间段动作。 |
-| 安静模式 | 托盘一键切到只呼吸和眨眼，适合学习或专注。 |
-| 素材可替换 | 所有 PNG 由 `assets/manifest.json` 映射，不需要改代码。 |
+> "我会，在那里的。" —— 流萤
 
-## 互动
+## ✨ 核心特性
 
-- 鼠标靠近：短暂开心回应。
-- 鼠标快速经过：短暂受惊。
-- 单击：害羞开心。
-- 拖拽：抱起移动，松手后轻轻回弹。
-- 空闲：自动随机播放低打扰小动作。
-- 时间：早晨、午间、傍晚、夜晚、深夜有不同状态。
-- 安静模式：关闭随机、靠近、受惊、点击反馈，只保留待机呼吸和眨眼。
+- **🍃 轻量纯净**：无边框透明窗口，不占任务栏，支持点击穿透（安静模式）。
+- **💓 灵动呼吸**：基于关键帧的缓动动画，呼吸、眨眼、回弹效果丝滑自然。
+- **🕙 随心而动**：根据系统时间（早晨、午间、傍晚、夜晚、深夜）自动切换不同状态。
+- **🤫 安静模式**：一键进入深度专注模式，仅保留基础呼吸动作，绝不打扰。
+- **🎨 高度自定义**：通过 `assets/manifest.json` 轻松替换所有图片素材。
 
-## 运行
+## 🚀 快速开始
 
-日常使用直接双击：
+### 1. 下载即用
+您可以直接从 [Releases](../../releases) 页面下载打包好的安装包：
+- 下载 `流萤桌宠_安装包.zip`
+- 解压后运行 `安装流萤桌宠.cmd` 即可完成部署。
 
-```text
-快捷启动\启动流萤桌宠.cmd
-```
+### 2. 本地开发
+如果您想自行编译运行，请确保已安装 [.NET 10 SDK](https://dotnet.microsoft.com/download)。
 
-本机已额外创建桌面快捷方式：`流萤桌宠`。
+```bash
+# 克隆仓库
+git clone https://github.com/zhaowei666666/liuying-desktop-pet.git
 
-正式发行安装包在：
+# 进入目录
+cd liuying-desktop-pet
 
-```text
-正式发行\流萤桌宠_安装包.zip
-```
-
-解压后双击：
-
-```text
-正式发行\安装流萤桌宠.cmd
-```
-
-```powershell
+# 运行
 dotnet run
 ```
 
-模拟现实时间动态：
+## 🎮 互动指南
 
-```powershell
-dotnet run -- --time 23:30
-```
+| 操作 | 响应 |
+| :--- | :--- |
+| **鼠标靠近** | 捕捉到你的气息，给予开心的回应 |
+| **快速经过** | 吓一跳！(°Д°) |
+| **鼠标单击** | 害羞地对你笑 |
+| **拖拽移动** | 抱起流萤，松手后她会优雅回弹 |
+| **闲置状态** | 偶尔会眨眨眼、挥挥手，或者陷入沉思 |
 
-框架依赖发布：
+## 🛠️ 托盘功能
 
-```powershell
-dotnet publish -c Release -r win-x64 --self-contained false
-```
+右键点击系统托盘图标，可以快速访问：
+- 👁️ 显示/隐藏桌宠
+- 📌 置顶显示开关
+- 🌙 安静模式切换
+- ⚙️ 开机自启设置
+- 🔍 缩放比例调节 (75% - 150%)
+- 🔄 重新加载素材
 
-## 托盘菜单
+## 📂 目录结构
 
-- 显示/隐藏桌宠
-- 置顶显示
-- 安静模式
-- 开机自启
-- 缩放 75% / 100% / 125% / 150%
-- 重新加载素材
-- 打开素材文件夹
-- 退出
+- `assets/`：存放所有 PNG 素材及 `manifest.json` 配置文件。
+- `仓库主页/`：项目的静态展示页，可以在 [GitHub Pages](https://zhaowei666666.github.io/liuying-desktop-pet/) 查看。
+- `正式发行/`：包含预编译的二进制文件及一键安装脚本。
 
-## 素材
+## 📄 开源协议
 
-把透明 PNG 放进 `assets` 文件夹，然后在 `assets/manifest.json` 里映射到对应状态。当前素材已经做过透明背景处理，原始备份保留在本地忽略目录中。
+本项目采用 [MIT License](LICENSE) 开源。
 
-## 设置位置
+---
 
-```text
-%AppData%\流萤桌宠\settings.json
-```
-
-## 仓库展示页
-
-仓库里附带了一个轻量静态展示页：
-
-```text
-仓库主页/index.html
-```
+<div align="center">
+  <p>如果您喜欢这个项目，欢迎给一个 ⭐️ Star！</p>
+  <p>Made with ❤️ by zhaowei</p>
+</div>
