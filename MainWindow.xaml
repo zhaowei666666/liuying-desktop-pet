@@ -94,25 +94,6 @@
                 </Grid>
             </Grid>
 
-            <Border x:Name="StatusBubble"
-                    Canvas.Left="14"
-                    Canvas.Top="0"
-                    Width="192"
-                    MinHeight="32"
-                    Padding="10,6"
-                    CornerRadius="16"
-                    Background="#EFFFFFFF"
-                    BorderBrush="#6531535A"
-                    BorderThickness="1"
-                    Opacity="0">
-                <TextBlock x:Name="StatusText"
-                           Text="缺少素材"
-                           Foreground="#243A40"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           TextWrapping="Wrap"
-                           TextAlignment="Center" />
-            </Border>
         </Canvas>
     </Grid>
 </Window>

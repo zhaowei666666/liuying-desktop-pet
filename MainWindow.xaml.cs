@@ -112,14 +112,12 @@ public partial class MainWindow : Window
             {
                 ApplyPose(PetPose.Dragged);
                 ApplyAnimation(PetPose.Dragged, dt);
-                UpdateStatusBubble(PetPose.Dragged);
                 return;
             }
 
             var pose = SelectPose(cursor, now);
             ApplyPose(pose);
             ApplyAnimation(pose, dt);
-            UpdateStatusBubble(pose);
         }
         catch (Exception exception)
         {
@@ -235,30 +233,6 @@ public partial class MainWindow : Window
         SpriteRotate.Angle = _currentMotion.Rotation;
         SpriteTranslate.X = _currentMotion.X;
         SpriteTranslate.Y = _currentMotion.Y;
-    }
-
-    private void UpdateStatusBubble(PetPose pose)
-    {
-        if (_currentSpriteProblem is not null)
-        {
-            StatusText.Text = $"{_currentSpriteProblem}\n把 PNG 放进 assets 文件夹";
-            StatusBubble.Opacity = 0.94;
-            return;
-        }
-
-        var visibleFor = (DateTime.Now - _poseChangedAt).TotalSeconds;
-        var shouldSpeak = pose is PetPose.Wave or PetPose.Happy or PetPose.Startled or PetPose.Dragged
-            or PetPose.Morning or PetPose.Noon or PetPose.Evening or PetPose.Night or PetPose.DeepNight
-            or PetPose.Clicked;
-
-        if (shouldSpeak && visibleFor < 1.8)
-        {
-            StatusText.Text = PetPoseText.GetBubble(pose);
-            StatusBubble.Opacity = 0.84;
-            return;
-        }
-
-        StatusBubble.Opacity = 0;
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
