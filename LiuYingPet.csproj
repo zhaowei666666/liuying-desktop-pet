@@ -7,10 +7,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>正式发行\app.ico</ApplicationIcon>
+    <AssemblyName>LiuYingPet</AssemblyName>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <Product>流萤桌宠</Product>
+    <Description>轻量、低打扰、带关键帧动画的 Windows 流萤桌宠</Description>
+    <Company>Wei Zhao</Company>
   </PropertyGroup>
 
   <ItemGroup>
     <None Update="assets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="正式发行\app.ico">
+      <Link>app.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,6 +1,16 @@
 $ErrorActionPreference = 'Stop'
 
 $root = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+$preferredDir = Join-Path $root '正式发行'
+$preferred = Get-ChildItem -LiteralPath $preferredDir -Filter 'LiuYingPet.exe' -Recurse -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -notmatch '\\obj\\' } |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
+
+if ($preferred) {
+    Start-Process -FilePath $preferred.FullName -WorkingDirectory $preferred.DirectoryName
+    exit 0
+}
 
 $exe = Get-ChildItem -LiteralPath $root -Filter 'LiuYingPet.exe' -Recurse -ErrorAction SilentlyContinue |
     Where-Object { $_.FullName -notmatch '\\obj\\' } |

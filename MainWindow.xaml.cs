@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private readonly Random _random = new();
     private readonly List<Forms.ToolStripMenuItem> _scaleItems = [];
 
+    private Drawing.Icon? _notifyIconAsset;
     private Forms.NotifyIcon? _trayIcon;
     private Forms.ToolStripMenuItem? _showItem;
     private Forms.ToolStripMenuItem? _topMostItem;
@@ -38,6 +39,7 @@ public partial class MainWindow : Window
     private PetPose? _forcedPose;
     private DateTime _poseChangedAt = DateTime.Now;
     private DateTime _forcedUntil = DateTime.MinValue;
+    private DateTime _lastHappyAt = DateTime.MinValue;
     private DateTime _lastStartleAt = DateTime.MinValue;
     private DateTime _nextRandomActionAt = DateTime.Now + TimeSpan.FromSeconds(5);
     private DateTime _lastTick = DateTime.Now;
@@ -50,6 +52,7 @@ public partial class MainWindow : Window
 
     private bool _isDragging;
     private bool _dragMoved;
+    private bool _wasCursorClose;
     private WpfPoint _dragStartCursor;
     private WpfPoint _dragStartWindow;
 
@@ -90,6 +93,7 @@ public partial class MainWindow : Window
         {
             SaveWindowPlacement();
             _trayIcon?.Dispose();
+            _notifyIconAsset?.Dispose();
             return;
         }
 
@@ -163,7 +167,17 @@ public partial class MainWindow : Window
 
         if (distance < CloseDistance)
         {
-            return PetPose.Happy;
+            if (!_wasCursorClose && (now - _lastHappyAt).TotalSeconds > 0.6)
+            {
+                _wasCursorClose = true;
+                _lastHappyAt = now;
+                ForcePose(PetPose.Happy, TimeSpan.FromSeconds(0.95));
+                return PetPose.Happy;
+            }
+        }
+        else
+        {
+            _wasCursorClose = false;
         }
 
         if (TryStartRandomAction(now, distance))
@@ -500,7 +514,7 @@ public partial class MainWindow : Window
 
         _trayIcon = new Forms.NotifyIcon
         {
-            Icon = Drawing.SystemIcons.Information,
+            Icon = LoadNotifyIcon(),
             Text = "流萤桌宠",
             ContextMenuStrip = menu,
             Visible = true
@@ -594,7 +608,35 @@ public partial class MainWindow : Window
         _timer.Stop();
         SaveWindowPlacement();
         _trayIcon?.Dispose();
+        _notifyIconAsset?.Dispose();
         System.Windows.Application.Current.Shutdown();
+    }
+
+    private Drawing.Icon LoadNotifyIcon()
+    {
+        if (_notifyIconAsset is not null)
+        {
+            return _notifyIconAsset;
+        }
+
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "app.ico");
+        if (File.Exists(iconPath))
+        {
+            try
+            {
+                _notifyIconAsset = new Drawing.Icon(iconPath);
+                return _notifyIconAsset;
+            }
+            catch (Exception exception)
+            {
+                ErrorLogService.Append(new InvalidOperationException(
+                    $"Failed to load tray icon '{iconPath}'.",
+                    exception));
+            }
+        }
+
+        _notifyIconAsset = (Drawing.Icon)Drawing.SystemIcons.Information.Clone();
+        return _notifyIconAsset;
     }
 
     [DllImport("user32.dll")]
