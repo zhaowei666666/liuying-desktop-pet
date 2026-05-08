@@ -17,7 +17,8 @@ internal enum PetPose
     Evening,
     Night,
     DeepNight,
-    Clicked
+    Clicked,
+    ReleaseBounce
 }
 
 internal static class PetPoseText
@@ -38,6 +39,7 @@ internal static class PetPoseText
         PetPose.Night => "有点困",
         PetPose.DeepNight => "睡着啦",
         PetPose.Clicked => "害羞开心",
+        PetPose.ReleaseBounce => "回弹",
         _ => "流萤"
     };
 

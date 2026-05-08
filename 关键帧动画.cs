@@ -200,7 +200,16 @@ internal static class KeyframeMotionLibrary
             Frame(0.28, 0, -1.2, 0, 1.070, 0.940),
             Frame(0.50, 0, -4.2, -2.0, 0.990, 1.035),
             Frame(0.74, 0, -1.0, 1.5, 1.018, 0.990),
-            Frame(0.95, 0, 0, 0, 1.000, 1.000))
+            Frame(0.95, 0, 0, 0, 1.000, 1.000)),
+
+        [PetPose.ReleaseBounce] = new MotionProfile(
+            0.72,
+            Frame(0.00, 0, -8.0, 0, 0.970, 1.065),
+            Frame(0.12, 0, 2.0, 0, 1.060, 0.940),
+            Frame(0.26, 0, -4.0, -2.2, 0.988, 1.030),
+            Frame(0.42, 0, 0.6, 1.6, 1.018, 0.985),
+            Frame(0.58, 0, -1.2, -0.6, 0.998, 1.008),
+            Frame(0.72, 0, 0, 0, 1.000, 1.000))
     };
 
     public static MotionSample Sample(PetPose pose, double elapsedSeconds) =>

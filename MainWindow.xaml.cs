@@ -25,11 +25,13 @@ public partial class MainWindow : Window
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly TimeOnly? _timeOverride;
     private readonly PetSettings _settings;
+    private readonly Random _random = new();
     private readonly List<Forms.ToolStripMenuItem> _scaleItems = [];
 
     private Forms.NotifyIcon? _trayIcon;
     private Forms.ToolStripMenuItem? _showItem;
     private Forms.ToolStripMenuItem? _topMostItem;
+    private Forms.ToolStripMenuItem? _quietModeItem;
     private Forms.ToolStripMenuItem? _startupItem;
 
     private PetPose _currentPose = PetPose.Idle;
@@ -37,6 +39,7 @@ public partial class MainWindow : Window
     private PetPose? _forcedPose;
     private DateTime _forcedUntil = DateTime.MinValue;
     private DateTime _lastStartleAt = DateTime.MinValue;
+    private DateTime _nextRandomActionAt = DateTime.MinValue;
     private DateTime _lastTick = DateTime.Now;
     private WpfPoint? _lastCursor;
     private PetPose? _loadedPose;
@@ -72,7 +75,13 @@ public partial class MainWindow : Window
         ApplyScale(_settings.Scale, save: false);
         PlaceInitialWindow();
         CreateTrayIcon();
-        ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.7));
+        ScheduleNextRandomAction(DateTime.Now);
+
+        if (!_settings.QuietMode)
+        {
+            ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.7));
+        }
+
         _timer.Start();
     }
 
@@ -134,6 +143,11 @@ public partial class MainWindow : Window
 
         _forcedPose = null;
 
+        if (_settings.QuietMode)
+        {
+            return GetQuietPose(now);
+        }
+
         var center = GetWindowCenter();
         var dx = cursor.X - center.X;
         var dy = cursor.Y - center.Y;
@@ -153,8 +167,70 @@ public partial class MainWindow : Window
             return PetPose.Happy;
         }
 
+        if (TryStartRandomAction(now, distance))
+        {
+            return _forcedPose ?? PetPose.Idle;
+        }
+
         return GetTimePose(now);
     }
+
+    private PetPose GetQuietPose(DateTime now)
+    {
+        var seconds = (int)_clock.Elapsed.TotalSeconds;
+        return seconds % 12 < 1 ? PetPose.Blink : PetPose.Idle;
+    }
+
+    private bool TryStartRandomAction(DateTime now, double cursorDistance)
+    {
+        if (now < _nextRandomActionAt)
+        {
+            return false;
+        }
+
+        ScheduleNextRandomAction(now);
+
+        if (cursorDistance < CloseDistance * 1.35 || _cursorSpeed > 900)
+        {
+            return false;
+        }
+
+        var pose = PickRandomAction(now);
+        ForcePose(pose, GetRandomActionDuration(pose));
+        return true;
+    }
+
+    private void ScheduleNextRandomAction(DateTime now)
+    {
+        _nextRandomActionAt = now + TimeSpan.FromSeconds(_random.Next(12, 27));
+    }
+
+    private PetPose PickRandomAction(DateTime now)
+    {
+        var time = _timeOverride ?? TimeOnly.FromDateTime(now);
+        var pool = time.Hour switch
+        {
+            < 6 => new[] { PetPose.Blink, PetPose.DeepNight },
+            < 11 => new[] { PetPose.Blink, PetPose.Wave, PetPose.Morning },
+            < 16 => new[] { PetPose.Blink, PetPose.Wave, PetPose.Noon },
+            < 21 => new[] { PetPose.Blink, PetPose.Wave, PetPose.Evening },
+            _ => new[] { PetPose.Blink, PetPose.Night }
+        };
+
+        return pool[_random.Next(pool.Length)];
+    }
+
+    private static TimeSpan GetRandomActionDuration(PetPose pose) => pose switch
+    {
+        PetPose.Wave => TimeSpan.FromSeconds(1.35),
+        PetPose.Morning => TimeSpan.FromSeconds(1.9),
+        PetPose.Noon => TimeSpan.FromSeconds(1.35),
+        PetPose.Evening => TimeSpan.FromSeconds(2.1),
+        PetPose.Night => TimeSpan.FromSeconds(2.0),
+        PetPose.DeepNight => TimeSpan.FromSeconds(2.4),
+        PetPose.Blink => TimeSpan.FromSeconds(0.8),
+        _ => TimeSpan.FromSeconds(1.2)
+    };
 
     private PetPose GetTimePose(DateTime now)
     {
@@ -275,11 +351,17 @@ public partial class MainWindow : Window
 
         if (_dragMoved)
         {
-            ForcePose(PetPose.Dragged, TimeSpan.FromSeconds(0.5));
+            if (!_settings.QuietMode)
+            {
+                ForcePose(PetPose.ReleaseBounce, TimeSpan.FromSeconds(0.75));
+            }
         }
         else
         {
-            ForcePose(PetPose.Clicked, TimeSpan.FromSeconds(1.5));
+            if (!_settings.QuietMode)
+            {
+                ForcePose(PetPose.Clicked, TimeSpan.FromSeconds(1.5));
+            }
         }
 
         e.Handled = true;
@@ -374,12 +456,20 @@ public partial class MainWindow : Window
         var menu = new Forms.ContextMenuStrip();
         _showItem = new Forms.ToolStripMenuItem("隐藏桌宠", null, (_, _) => ToggleVisibility());
         _topMostItem = new Forms.ToolStripMenuItem("置顶显示") { CheckOnClick = true };
+        _quietModeItem = new Forms.ToolStripMenuItem("安静模式") { CheckOnClick = true };
         _startupItem = new Forms.ToolStripMenuItem("开机自启") { CheckOnClick = true };
 
         _topMostItem.Click += (_, _) =>
         {
             _settings.TopMost = _topMostItem.Checked;
             Topmost = _settings.TopMost;
+            _settingsService.Save(_settings);
+        };
+        _quietModeItem.Click += (_, _) =>
+        {
+            _settings.QuietMode = _quietModeItem.Checked;
+            _forcedPose = null;
+            ScheduleNextRandomAction(DateTime.Now);
             _settingsService.Save(_settings);
         };
         _startupItem.Click += (_, _) =>
@@ -393,6 +483,7 @@ public partial class MainWindow : Window
         menu.Items.Add(_showItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(_topMostItem);
+        menu.Items.Add(_quietModeItem);
         menu.Items.Add(_startupItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(CreateScaleItem("缩放 75%", 0.75));
@@ -440,6 +531,11 @@ public partial class MainWindow : Window
             _topMostItem.Checked = _settings.TopMost;
         }
 
+        if (_quietModeItem is not null)
+        {
+            _quietModeItem.Checked = _settings.QuietMode;
+        }
+
         if (_startupItem is not null)
         {
             _startupItem.Checked = StartupService.IsEnabled();
@@ -475,7 +571,10 @@ public partial class MainWindow : Window
         _loadedPose = null;
         SpriteImage.Source = null;
         ApplyPose(_currentPose);
-        ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.2));
+        if (!_settings.QuietMode)
+        {
+            ForcePose(PetPose.Wave, TimeSpan.FromSeconds(1.2));
+        }
     }
 
     private void OpenAssetsFolder()
